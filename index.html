@@ -7,164 +7,273 @@
   <meta name="theme-color" content="#0f172a">
   <style>
     *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
     body{
-      margin:0;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif;
       background:#0f172a;
-      color:#fff;
+      color:#f8fafc;
       min-height:100vh;
-      padding:18px;
+      padding:12px;
     }
-    .app{
-      max-width:520px;
-      margin:0 auto;
-    }
-    h1{
-      font-size:26px;
-      margin:8px 0 16px;
-      text-align:center;
-    }
+    .app{max-width:760px;margin:0 auto}
+    h1{font-size:24px;text-align:center;margin:8px 0 12px}
+    .note{font-size:14px;color:#cbd5e1;text-align:center;margin-bottom:10px;line-height:1.45}
     .card{
       background:#111827;
       border:1px solid #334155;
-      border-radius:18px;
-      padding:16px;
-      margin-bottom:14px;
-      box-shadow:0 10px 25px rgba(0,0,0,.25);
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:10px;
+      box-shadow:0 8px 20px rgba(0,0,0,.22);
     }
-    label{
-      display:block;
-      font-size:20px;
-      font-weight:700;
-      margin-bottom:8px;
-    }
+    label{display:block;font-size:19px;font-weight:800;margin-bottom:7px}
     input{
       width:100%;
       font-size:30px;
-      padding:14px;
-      border-radius:14px;
+      padding:12px;
+      border-radius:13px;
       border:2px solid #475569;
       background:#020617;
-      color:white;
+      color:#fff;
       outline:none;
     }
     input:focus{border-color:#38bdf8}
-    .unit{
-      font-size:16px;
-      color:#cbd5e1;
-      margin-top:6px;
-    }
-    .result{
+    .unit{font-size:14px;color:#cbd5e1;margin-top:5px}
+    .summary{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:10px;
+      gap:8px;
       align-items:center;
-      font-size:22px;
-      padding:10px 0;
-      border-bottom:1px solid #334155;
+      font-size:18px;
     }
-    .result:last-child{border-bottom:none}
-    .name{color:#e5e7eb;font-weight:700}
-    .value{
+    .summary .v{
       text-align:right;
-      font-size:30px;
+      font-size:25px;
       font-weight:900;
-      color:#7dd3fc;
+      color:#fde68a;
     }
-    .small .value{font-size:28px;color:#fde68a}
-    .hint{
-      color:#cbd5e1;
-      font-size:15px;
-      line-height:1.5;
-      text-align:center;
-      margin-top:12px;
+    .points{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
     }
-    .warn{
-      color:#fecaca;
+    .pointBox{
+      border:1px solid #334155;
+      background:#020617;
+      border-radius:14px;
+      padding:10px;
       text-align:center;
+    }
+    .pointBox .name{font-size:17px;font-weight:900}
+    .pointBox .pos{font-size:22px;font-weight:900;color:#7dd3fc;margin-top:6px}
+    .hidden{display:none!important}
+    .depthGrid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    .depthCard{
+      border:1px solid #334155;
+      border-radius:16px;
+      padding:12px;
+      background:#0b1220;
+    }
+    .depthHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .depthTitle{font-size:21px;font-weight:900}
+    .depthPos{font-size:15px;color:#cbd5e1}
+    .rule{
+      margin-top:9px;
+      color:#fde68a;
       font-size:16px;
-      min-height:24px;
-      margin-top:8px;
+      font-weight:800;
+    }
+    .rows{
+      margin-top:6px;
+      border-top:1px solid #334155;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      padding:8px 0;
+      border-bottom:1px solid #334155;
+      align-items:center;
+    }
+    .row:last-child{border-bottom:0}
+    .row .k{font-size:18px;font-weight:800;color:#e2e8f0}
+    .row .val{text-align:right;font-size:25px;font-weight:950;color:#7dd3fc}
+    .warn{color:#fecaca;font-weight:800;font-size:15px;margin-top:8px;line-height:1.4}
+    @media (max-width:560px){
+      body{padding:10px}
+      h1{font-size:22px}
+      .points{grid-template-columns:1fr 1fr 1fr;gap:6px}
+      .pointBox{padding:8px 4px}
+      .pointBox .name{font-size:15px}
+      .pointBox .pos{font-size:19px}
+      input{font-size:28px}
+      .row .val{font-size:23px}
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <h1>河寬水深採樣計算</h1>
+<main class="app">
+  <h1>河寬水深採樣計算</h1>
+  <div class="note">
+    河寬 ≤ 6m：中央 1 點。河寬 &gt; 6m：左中右 3 點。<br>
+    水深依規則自動判斷：0.6h／0.2h+0.8h／0.2h+0.6h+0.8h。
+  </div>
 
-    <section class="card">
-      <label for="width">河寬</label>
-      <input id="width" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例如 25.6">
-      <div class="unit">單位：公尺 m</div>
-    </section>
+  <section class="card">
+    <label for="width">河寬</label>
+    <input id="width" type="number" inputmode="decimal" min="0" step="0.01" placeholder="例如 16">
+    <div class="unit">單位：公尺 m</div>
+  </section>
 
-    <section class="card">
-      <label for="depth">水深</label>
-      <input id="depth" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例如 160">
-      <div class="unit">單位：公分 cm</div>
-    </section>
-
-    <section class="card">
-      <div class="result small">
-        <div class="name">中央位置</div>
-        <div class="value" id="centerWidth">—</div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="result">
-        <div class="name">左點 0.2D</div>
-        <div class="value" id="leftDepth">—</div>
-      </div>
-      <div class="result">
-        <div class="name">中央 0.5D</div>
-        <div class="value" id="midDepth">—</div>
-      </div>
-      <div class="result">
-        <div class="name">右點 0.8D</div>
-        <div class="value" id="rightDepth">—</div>
-      </div>
-      <div class="warn" id="warn"></div>
-    </section>
-
-    <div class="hint">
-      輸入後會自動計算，不用按按鈕。<br>
-      可用 Safari 加入主畫面，當成 App 使用。
+  <section class="card">
+    <div class="summary">
+      <div>採樣點判斷</div>
+      <div class="v" id="mode">—</div>
     </div>
-  </main>
+  </section>
 
-  <script>
-    const widthInput = document.getElementById("width");
-    const depthInput = document.getElementById("depth");
+  <section class="card">
+    <div class="points">
+      <div class="pointBox" id="leftPoint">
+        <div class="name">左 1/4</div>
+        <div class="pos" id="leftPos">—</div>
+      </div>
+      <div class="pointBox" id="midPoint">
+        <div class="name">中 2/4</div>
+        <div class="pos" id="midPos">—</div>
+      </div>
+      <div class="pointBox" id="rightPoint">
+        <div class="name">右 3/4</div>
+        <div class="pos" id="rightPos">—</div>
+      </div>
+    </div>
+  </section>
 
-    const centerWidth = document.getElementById("centerWidth");
-    const leftDepth = document.getElementById("leftDepth");
-    const midDepth = document.getElementById("midDepth");
-    const rightDepth = document.getElementById("rightDepth");
-    const warn = document.getElementById("warn");
+  <section class="depthGrid">
+    <div class="depthCard" id="leftCard">
+      <div class="depthHeader">
+        <div>
+          <div class="depthTitle">左岸水深</div>
+          <div class="depthPos">位置：<span id="leftPos2">—</span></div>
+        </div>
+      </div>
+      <input id="leftDepth" type="number" inputmode="decimal" min="0" step="0.01" placeholder="輸入左岸水深 m">
+      <div class="unit">單位：公尺 m</div>
+      <div class="rule" id="leftRule">—</div>
+      <div class="rows" id="leftRows"></div>
+      <div class="warn" id="leftWarn"></div>
+    </div>
 
-    function fmt(n){
-      if (!Number.isFinite(n)) return "—";
-      return (Math.round(n * 10) / 10).toFixed(1);
+    <div class="depthCard" id="midCard">
+      <div class="depthHeader">
+        <div>
+          <div class="depthTitle">中央水深</div>
+          <div class="depthPos">位置：<span id="midPos2">—</span></div>
+        </div>
+      </div>
+      <input id="midDepth" type="number" inputmode="decimal" min="0" step="0.01" placeholder="輸入中央水深 m">
+      <div class="unit">單位：公尺 m</div>
+      <div class="rule" id="midRule">—</div>
+      <div class="rows" id="midRows"></div>
+      <div class="warn" id="midWarn"></div>
+    </div>
+
+    <div class="depthCard" id="rightCard">
+      <div class="depthHeader">
+        <div>
+          <div class="depthTitle">右岸水深</div>
+          <div class="depthPos">位置：<span id="rightPos2">—</span></div>
+        </div>
+      </div>
+      <input id="rightDepth" type="number" inputmode="decimal" min="0" step="0.01" placeholder="輸入右岸水深 m">
+      <div class="unit">單位：公尺 m</div>
+      <div class="rule" id="rightRule">—</div>
+      <div class="rows" id="rightRows"></div>
+      <div class="warn" id="rightWarn"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const width = $("width");
+  const ids = ["left","mid","right"];
+
+  function n(v){ return parseFloat(v); }
+  function ok(x){ return Number.isFinite(x) && x > 0; }
+  function fmt(x){ return Number.isFinite(x) ? (Math.round(x*100)/100).toFixed(2) : "—"; }
+
+  function depthRule(h){
+    if(!ok(h)) return {name:"—", rows:[], warn:""};
+    if(h <= 0.5){
+      return {name:"水深 ≤ 0.5m：未達表列規則，請依現場規範確認", rows:[], warn:"照片規則從 0.5m < h 開始；此水深請人工確認。"};
     }
-
-    function calc(){
-      const w = parseFloat(widthInput.value);
-      const d = parseFloat(depthInput.value);
-
-      centerWidth.textContent = Number.isFinite(w) ? fmt(w / 2) + " m" : "—";
-      leftDepth.textContent = Number.isFinite(d) ? fmt(d * 0.2) + " cm" : "—";
-      midDepth.textContent = Number.isFinite(d) ? fmt(d * 0.5) + " cm" : "—";
-      rightDepth.textContent = Number.isFinite(d) ? fmt(d * 0.8) + " cm" : "—";
-
-      warn.textContent = "";
-      if (Number.isFinite(w) && w <= 0) warn.textContent = "河寬要大於 0";
-      if (Number.isFinite(d) && d <= 0) warn.textContent = "水深要大於 0";
+    if(h > 0.5 && h <= 1.5){
+      return {name:"0.5m < h ≤ 1.5m：採 0.6h", rows:[["0.6h", h*0.6]], warn:""};
     }
+    if(h > 1.5 && h < 3.0){
+      return {name:"1.5m < h < 3.0m：採 0.2h、0.8h", rows:[["0.2h", h*0.2],["0.8h", h*0.8]], warn:""};
+    }
+    return {name:"h ≥ 3.0m：採 0.2h、0.6h、0.8h", rows:[["0.2h", h*0.2],["0.6h", h*0.6],["0.8h", h*0.8]], warn:""};
+  }
 
-    widthInput.addEventListener("input", calc);
-    depthInput.addEventListener("input", calc);
-    calc();
-  </script>
+  function renderRows(el, rows){
+    if(rows.length === 0){ el.innerHTML = ""; return; }
+    el.innerHTML = rows.map(r => `
+      <div class="row">
+        <div class="k">${r[0]}</div>
+        <div class="val">${fmt(r[1])} m</div>
+      </div>
+    `).join("");
+  }
+
+  function calc(){
+    const w = n(width.value);
+    const validW = ok(w);
+    const three = validW && w > 6;
+
+    $("mode").textContent = !validW ? "—" : (three ? "左中右 3 點" : "中央 1 點");
+
+    const pos = {
+      left: validW ? w/4 : NaN,
+      mid: validW ? w/2 : NaN,
+      right: validW ? w*3/4 : NaN
+    };
+
+    $("leftPos").textContent = fmt(pos.left) + " m";
+    $("midPos").textContent = fmt(pos.mid) + " m";
+    $("rightPos").textContent = fmt(pos.right) + " m";
+    $("leftPos2").textContent = fmt(pos.left) + " m";
+    $("midPos2").textContent = fmt(pos.mid) + " m";
+    $("rightPos2").textContent = fmt(pos.right) + " m";
+
+    $("leftPoint").classList.toggle("hidden", !three);
+    $("rightPoint").classList.toggle("hidden", !three);
+    $("leftCard").classList.toggle("hidden", !three);
+    $("rightCard").classList.toggle("hidden", !three);
+
+    ids.forEach(id => {
+      const h = n($(id+"Depth").value);
+      const r = depthRule(h);
+      $(id+"Rule").textContent = r.name;
+      renderRows($(id+"Rows"), r.rows);
+      $(id+"Warn").textContent = r.warn;
+    });
+  }
+
+  width.addEventListener("input", calc);
+  ids.forEach(id => $(id+"Depth").addEventListener("input", calc));
+  calc();
+</script>
 </body>
 </html>
