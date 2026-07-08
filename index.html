@@ -3,115 +3,72 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>河寬水深採樣計算</title>
+  <title>河寬水深採樣計算 V5</title>
   <meta name="theme-color" content="#0f172a">
   <style>
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
     body{
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif;
-      background:#0f172a;
-      color:#f8fafc;
-      min-height:100vh;
-      padding:10px;
+      background:#0f172a;color:#f8fafc;min-height:100vh;padding:10px;
     }
-    .app{max-width:860px;margin:0 auto}
-    h1{font-size:24px;text-align:center;margin:8px 0 10px}
-    .note{font-size:14px;color:#cbd5e1;text-align:center;margin-bottom:10px;line-height:1.45}
-    .card{
-      background:#111827;
-      border:1px solid #334155;
-      border-radius:16px;
-      padding:12px;
-      margin-bottom:10px;
-      box-shadow:0 8px 20px rgba(0,0,0,.22);
-    }
-    label{display:block;font-size:19px;font-weight:900;margin-bottom:7px}
-    input{
-      width:100%;
-      font-size:30px;
-      padding:12px;
-      border-radius:13px;
-      border:2px solid #475569;
-      background:#020617;
-      color:#fff;
-      outline:none;
-    }
+    .app{max-width:980px;margin:0 auto}
+    h1{font-size:24px;text-align:center;margin:8px 0 6px}
+    .sub{text-align:center;color:#cbd5e1;font-size:14px;line-height:1.45;margin-bottom:10px}
+    .card{background:#111827;border:1px solid #334155;border-radius:16px;padding:12px;margin-bottom:10px;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+    label{display:block;font-size:20px;font-weight:900;margin-bottom:7px}
+    input{width:100%;font-size:30px;padding:12px;border-radius:13px;border:2px solid #475569;background:#020617;color:#fff;outline:none}
     input:focus{border-color:#38bdf8}
     .unit{font-size:14px;color:#cbd5e1;margin-top:5px}
-    .summary{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      align-items:center;
-      font-size:18px;
-    }
-    .summary .v{
-      text-align:right;
-      font-size:25px;
-      font-weight:950;
-      color:#fde68a;
-    }
-    .points{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:7px;
-    }
-    .pointBox{
-      border:1px solid #334155;
-      background:#020617;
-      border-radius:14px;
-      padding:9px 4px;
-      text-align:center;
-    }
-    .pointBox .name{font-size:15px;font-weight:950}
-    .pointBox .pos{font-size:22px;font-weight:950;color:#7dd3fc;margin-top:5px}
-    .hidden{display:none!important}
-    .depthGrid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:8px;
-    }
-    .depthCard{
-      border:1px solid #334155;
-      border-radius:16px;
-      padding:10px;
-      background:#0b1220;
-    }
-    .depthTitle{font-size:20px;font-weight:950;margin-bottom:2px}
+    .topGrid{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;align-items:stretch}
+    .modeBox{display:flex;flex-direction:column;justify-content:center;gap:8px}
+    .modeTitle{color:#cbd5e1;font-size:16px;font-weight:800}
+    .modeVal{font-size:28px;font-weight:950;color:#fde68a}
+    .btns{display:grid;grid-template-columns:1fr;gap:8px;margin-top:4px}
+    button{font-size:20px;font-weight:900;border:0;border-radius:13px;padding:13px;background:#334155;color:#fff}
+    button:active{transform:scale(.99)}
+    .riverLine{position:relative;height:86px;background:#020617;border:1px solid #334155;border-radius:16px;padding:12px;margin-top:6px;overflow:hidden}
+    .bar{position:absolute;left:16px;right:16px;top:40px;height:6px;background:#64748b;border-radius:99px}
+    .bank{position:absolute;top:30px;width:4px;height:26px;background:#e2e8f0;border-radius:99px}
+    .bank.left{left:16px}.bank.right{right:16px}
+    .mark{position:absolute;top:14px;transform:translateX(-50%);text-align:center;min-width:70px}
+    .mark .dot{width:14px;height:14px;background:#38bdf8;border-radius:50%;margin:21px auto 2px;border:2px solid #e0f2fe}
+    .mark .n{font-size:15px;font-weight:950}
+    .mark .p{font-size:18px;font-weight:950;color:#7dd3fc}
+    .w0,.wEnd{position:absolute;top:59px;color:#cbd5e1;font-size:13px;font-weight:800}
+    .w0{left:12px}.wEnd{right:12px}
+    .points{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .pointBox{border:1px solid #334155;background:#020617;border-radius:14px;padding:9px 4px;text-align:center}
+    .pointBox .name{font-size:16px;font-weight:950}.pointBox .pos{font-size:23px;font-weight:950;color:#7dd3fc;margin-top:5px}
+    .depthGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .depthCard{border:1px solid #334155;border-radius:16px;padding:10px;background:#0b1220}
+    .depthTitle{font-size:21px;font-weight:950;margin-bottom:2px}
     .depthPos{font-size:14px;color:#cbd5e1;margin-bottom:8px}
     .depthInputLabel{font-size:15px;font-weight:800;margin-bottom:5px;color:#e2e8f0}
     .depthCard input{font-size:26px;padding:10px}
-    .rule{
-      margin-top:8px;
-      color:#fde68a;
-      font-size:14px;
-      font-weight:900;
-      line-height:1.35;
-      min-height:38px;
-    }
-    .rows{
-      margin-top:6px;
-      border-top:1px solid #334155;
-    }
-    .row{
-      display:grid;
-      grid-template-columns:.9fr 1.1fr;
-      gap:6px;
-      padding:7px 0;
-      border-bottom:1px solid #334155;
-      align-items:center;
-    }
+    .rule{margin-top:8px;color:#fde68a;font-size:14px;font-weight:900;line-height:1.35;min-height:38px}
+    .rows{margin-top:6px;border-top:1px solid #334155}
+    .row{display:grid;grid-template-columns:.85fr 1.15fr;gap:6px;padding:7px 0;border-bottom:1px solid #334155;align-items:center}
     .row:last-child{border-bottom:0}
     .row .k{font-size:17px;font-weight:900;color:#e2e8f0}
-    .row .val{text-align:right;font-size:23px;font-weight:950;color:#7dd3fc}
+    .row .val{text-align:right;font-size:24px;font-weight:950;color:#7dd3fc}
     .warn{color:#fecaca;font-weight:850;font-size:13px;margin-top:7px;line-height:1.35}
-    @media (max-width:700px){
+    .summaryTitle{font-size:20px;font-weight:950;margin-bottom:8px}
+    .summaryGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .sumBox{background:#020617;border:1px solid #334155;border-radius:14px;padding:10px}
+    .sumName{font-size:18px;font-weight:950;margin-bottom:6px}
+    .sumLine{font-size:15px;color:#e2e8f0;line-height:1.55}
+    .sumLine b{color:#7dd3fc}
+    .hidden{display:none!important}
+    @media(max-width:760px){
       body{padding:8px}
       h1{font-size:22px}
-      .points{gap:6px}
-      .pointBox .pos{font-size:19px}
-      .depthGrid{grid-template-columns:1fr;gap:9px}
+      .topGrid{grid-template-columns:1fr}
+      .depthGrid,.summaryGrid{grid-template-columns:1fr}
+      .points{grid-template-columns:repeat(3,1fr);gap:6px}
+      .pointBox .name{font-size:15px}.pointBox .pos{font-size:19px}
+      .riverLine{height:92px}
+      .mark .p{font-size:16px}
       .depthCard{padding:11px}
       .depthTitle{font-size:21px}
       .row .val{font-size:24px}
@@ -120,39 +77,47 @@
 </head>
 <body>
 <main class="app">
-  <h1>河寬水深採樣計算</h1>
-  <div class="note">
+  <h1>河寬水深採樣計算 V5</h1>
+  <div class="sub">
     河寬 ≤ 6m：中央 1 點；河寬 &gt; 6m：左中右 3 點。<br>
-    水深輸入用 cm，採樣深度答案用 m。
+    水深輸入 cm，答案輸出 m。河寬位置小數 1 位，採樣深度小數 2 位。
   </div>
 
-  <section class="card">
-    <label for="width">河寬</label>
-    <input id="width" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例如 25.6">
-    <div class="unit">單位：公尺 m；位置顯示小數點 1 位</div>
+  <section class="topGrid">
+    <div class="card">
+      <label for="width">河寬</label>
+      <input id="width" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例如 25.6">
+      <div class="unit">單位：公尺 m</div>
+    </div>
+    <div class="card modeBox">
+      <div class="modeTitle">採樣點判斷</div>
+      <div class="modeVal" id="mode">—</div>
+      <div class="btns"><button id="clearBtn" type="button">清除全部</button></div>
+    </div>
   </section>
 
   <section class="card">
-    <div class="summary">
-      <div>採樣點判斷</div>
-      <div class="v" id="mode">—</div>
+    <div class="riverLine">
+      <div class="bar"></div>
+      <div class="bank left"></div><div class="bank right"></div>
+      <div class="w0">0m</div><div class="wEnd" id="endWidth">—</div>
+      <div class="mark" id="lineLeft" style="left:25%">
+        <div class="n">左 1/4</div><div class="dot"></div><div class="p" id="leftLinePos">—</div>
+      </div>
+      <div class="mark" id="lineMid" style="left:50%">
+        <div class="n">中 2/4</div><div class="dot"></div><div class="p" id="midLinePos">—</div>
+      </div>
+      <div class="mark" id="lineRight" style="left:75%">
+        <div class="n">右 3/4</div><div class="dot"></div><div class="p" id="rightLinePos">—</div>
+      </div>
     </div>
   </section>
 
   <section class="card">
     <div class="points">
-      <div class="pointBox" id="leftPoint">
-        <div class="name">左 1/4</div>
-        <div class="pos" id="leftPos">—</div>
-      </div>
-      <div class="pointBox" id="midPoint">
-        <div class="name">中 2/4</div>
-        <div class="pos" id="midPos">—</div>
-      </div>
-      <div class="pointBox" id="rightPoint">
-        <div class="name">右 3/4</div>
-        <div class="pos" id="rightPos">—</div>
-      </div>
+      <div class="pointBox" id="leftPoint"><div class="name">左 1/4</div><div class="pos" id="leftPos">—</div></div>
+      <div class="pointBox"><div class="name">中 2/4</div><div class="pos" id="midPos">—</div></div>
+      <div class="pointBox" id="rightPoint"><div class="name">右 3/4</div><div class="pos" id="rightPos">—</div></div>
     </div>
   </section>
 
@@ -162,9 +127,7 @@
       <div class="depthPos">位置：<span id="leftPos2">—</span></div>
       <div class="depthInputLabel">水深 cm</div>
       <input id="leftDepth" type="number" inputmode="decimal" min="0" step="1" placeholder="例如 201">
-      <div class="rule" id="leftRule">—</div>
-      <div class="rows" id="leftRows"></div>
-      <div class="warn" id="leftWarn"></div>
+      <div class="rule" id="leftRule">—</div><div class="rows" id="leftRows"></div><div class="warn" id="leftWarn"></div>
     </div>
 
     <div class="depthCard" id="midCard">
@@ -172,9 +135,7 @@
       <div class="depthPos">位置：<span id="midPos2">—</span></div>
       <div class="depthInputLabel">水深 cm</div>
       <input id="midDepth" type="number" inputmode="decimal" min="0" step="1" placeholder="例如 204">
-      <div class="rule" id="midRule">—</div>
-      <div class="rows" id="midRows"></div>
-      <div class="warn" id="midWarn"></div>
+      <div class="rule" id="midRule">—</div><div class="rows" id="midRows"></div><div class="warn" id="midWarn"></div>
     </div>
 
     <div class="depthCard" id="rightCard">
@@ -182,9 +143,25 @@
       <div class="depthPos">位置：<span id="rightPos2">—</span></div>
       <div class="depthInputLabel">水深 cm</div>
       <input id="rightDepth" type="number" inputmode="decimal" min="0" step="1" placeholder="例如 198">
-      <div class="rule" id="rightRule">—</div>
-      <div class="rows" id="rightRows"></div>
-      <div class="warn" id="rightWarn"></div>
+      <div class="rule" id="rightRule">—</div><div class="rows" id="rightRows"></div><div class="warn" id="rightWarn"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="summaryTitle">採樣摘要</div>
+    <div class="summaryGrid">
+      <div class="sumBox" id="sumLeftBox">
+        <div class="sumName">左岸</div>
+        <div class="sumLine" id="sumLeft">—</div>
+      </div>
+      <div class="sumBox">
+        <div class="sumName">中央</div>
+        <div class="sumLine" id="sumMid">—</div>
+      </div>
+      <div class="sumBox" id="sumRightBox">
+        <div class="sumName">右岸</div>
+        <div class="sumLine" id="sumRight">—</div>
+      </div>
     </div>
   </section>
 </main>
@@ -193,42 +170,29 @@
   const $ = id => document.getElementById(id);
   const width = $("width");
   const ids = ["left","mid","right"];
+  const labelMap = {left:"左岸", mid:"中央", right:"右岸"};
 
   function n(v){ return parseFloat(v); }
   function ok(x){ return Number.isFinite(x) && x > 0; }
-  function fmtM1(x){ return Number.isFinite(x) ? (Math.round(x*10)/10).toFixed(1) : "—"; }
-  function fmtM2(x){ return Number.isFinite(x) ? (Math.round(x*100)/100).toFixed(2) : "—"; }
+  function fmt1(x){ return Number.isFinite(x) ? (Math.round(x*10)/10).toFixed(1) : "—"; }
+  function fmt2(x){ return Number.isFinite(x) ? (Math.round(x*100)/100).toFixed(2) : "—"; }
 
   function depthRuleFromCm(cm){
-    if(!ok(cm)) return {name:"—", rows:[], warn:""};
-    const h = cm / 100; // cm -> m
-
+    if(!ok(cm)) return {name:"—", rows:[], warn:"", text:"—"};
+    const h = cm / 100;
     if(h <= 0.5){
-      return {
-        name:"水深 ≤ 50cm：請依現場規範確認",
-        rows:[],
-        warn:"照片規則從 0.5m < h 開始；此水深請人工確認。"
-      };
+      return {name:"水深 ≤ 50cm：請依現場規範確認", rows:[], warn:"照片規則從 0.5m < h 開始；此水深請人工確認。", text:"請人工確認"};
     }
     if(h > 0.5 && h <= 1.5){
-      return {
-        name:"50cm < h ≤ 150cm：採 0.6h",
-        rows:[["0.6h", h*0.6]],
-        warn:""
-      };
+      const rows = [["0.6h", h*0.6]];
+      return {name:"50cm < h ≤ 150cm：採 0.6h", rows, warn:"", text:rows.map(r=>`${r[0]} ${fmt2(r[1])}m`).join("、")};
     }
     if(h > 1.5 && h < 3.0){
-      return {
-        name:"150cm < h < 300cm：採 0.2h、0.8h",
-        rows:[["0.2h", h*0.2],["0.8h", h*0.8]],
-        warn:""
-      };
+      const rows = [["0.2h", h*0.2],["0.8h", h*0.8]];
+      return {name:"150cm < h < 300cm：採 0.2h、0.8h", rows, warn:"", text:rows.map(r=>`${r[0]} ${fmt2(r[1])}m`).join("、")};
     }
-    return {
-      name:"h ≥ 300cm：採 0.2h、0.6h、0.8h",
-      rows:[["0.2h", h*0.2],["0.6h", h*0.6],["0.8h", h*0.8]],
-      warn:""
-    };
+    const rows = [["0.2h", h*0.2],["0.6h", h*0.6],["0.8h", h*0.8]];
+    return {name:"h ≥ 300cm：採 0.2h、0.6h、0.8h", rows, warn:"", text:rows.map(r=>`${r[0]} ${fmt2(r[1])}m`).join("、")};
   }
 
   function renderRows(el, rows){
@@ -236,7 +200,7 @@
     el.innerHTML = rows.map(r => `
       <div class="row">
         <div class="k">${r[0]}</div>
-        <div class="val">${fmtM2(r[1])} m</div>
+        <div class="val">${fmt2(r[1])} m</div>
       </div>
     `).join("");
   }
@@ -245,26 +209,21 @@
     const w = n(width.value);
     const validW = ok(w);
     const three = validW && w > 6;
-
     $("mode").textContent = !validW ? "—" : (three ? "左中右 3 點" : "中央 1 點");
+    $("endWidth").textContent = validW ? fmt1(w) + "m" : "—";
 
-    const pos = {
-      left: validW ? w/4 : NaN,
-      mid: validW ? w/2 : NaN,
-      right: validW ? w*3/4 : NaN
-    };
+    const pos = {left:validW?w/4:NaN, mid:validW?w/2:NaN, right:validW?w*3/4:NaN};
 
-    $("leftPos").textContent = fmtM1(pos.left) + " m";
-    $("midPos").textContent = fmtM1(pos.mid) + " m";
-    $("rightPos").textContent = fmtM1(pos.right) + " m";
-    $("leftPos2").textContent = fmtM1(pos.left) + " m";
-    $("midPos2").textContent = fmtM1(pos.mid) + " m";
-    $("rightPos2").textContent = fmtM1(pos.right) + " m";
+    ["left","mid","right"].forEach(id=>{
+      const txt = fmt1(pos[id]) + " m";
+      $(id+"Pos").textContent = txt;
+      $(id+"Pos2").textContent = txt;
+      $(id+"LinePos").textContent = txt;
+    });
 
-    $("leftPoint").classList.toggle("hidden", !three);
-    $("rightPoint").classList.toggle("hidden", !three);
-    $("leftCard").classList.toggle("hidden", !three);
-    $("rightCard").classList.toggle("hidden", !three);
+    ["leftPoint","rightPoint","leftCard","rightCard","lineLeft","lineRight","sumLeftBox","sumRightBox"].forEach(id=>{
+      $(id).classList.toggle("hidden", !three);
+    });
 
     ids.forEach(id => {
       const cm = n($(id+"Depth").value);
@@ -272,9 +231,20 @@
       $(id+"Rule").textContent = r.name;
       renderRows($(id+"Rows"), r.rows);
       $(id+"Warn").textContent = r.warn;
+
+      const posText = fmt1(pos[id]) + " m";
+      const depthText = ok(cm) ? `${cm} cm（${fmt2(cm/100)} m）` : "—";
+      const samplingText = r.text;
+      $("sum" + (id === "mid" ? "Mid" : id === "left" ? "Left" : "Right")).innerHTML =
+        `位置：<b>${posText}</b><br>水深：<b>${depthText}</b><br>採樣：<b>${samplingText}</b>`;
     });
   }
 
+  $("clearBtn").addEventListener("click", () => {
+    width.value = "";
+    ids.forEach(id => $(id+"Depth").value = "");
+    calc();
+  });
   width.addEventListener("input", calc);
   ids.forEach(id => $(id+"Depth").addEventListener("input", calc));
   calc();
