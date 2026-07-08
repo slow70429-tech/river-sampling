@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>河寬水深採樣計算</title>
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif;
+      background:#0f172a;
+      color:#fff;
+      min-height:100vh;
+      padding:18px;
+    }
+    .app{
+      max-width:520px;
+      margin:0 auto;
+    }
+    h1{
+      font-size:26px;
+      margin:8px 0 16px;
+      text-align:center;
+    }
+    .card{
+      background:#111827;
+      border:1px solid #334155;
+      border-radius:18px;
+      padding:16px;
+      margin-bottom:14px;
+      box-shadow:0 10px 25px rgba(0,0,0,.25);
+    }
+    label{
+      display:block;
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+    input{
+      width:100%;
+      font-size:30px;
+      padding:14px;
+      border-radius:14px;
+      border:2px solid #475569;
+      background:#020617;
+      color:white;
+      outline:none;
+    }
+    input:focus{border-color:#38bdf8}
+    .unit{
+      font-size:16px;
+      color:#cbd5e1;
+      margin-top:6px;
+    }
+    .result{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      align-items:center;
+      font-size:22px;
+      padding:10px 0;
+      border-bottom:1px solid #334155;
+    }
+    .result:last-child{border-bottom:none}
+    .name{color:#e5e7eb;font-weight:700}
+    .value{
+      text-align:right;
+      font-size:30px;
+      font-weight:900;
+      color:#7dd3fc;
+    }
+    .small .value{font-size:28px;color:#fde68a}
+    .hint{
+      color:#cbd5e1;
+      font-size:15px;
+      line-height:1.5;
+      text-align:center;
+      margin-top:12px;
+    }
+    .warn{
+      color:#fecaca;
+      text-align:center;
+      font-size:16px;
+      min-height:24px;
+      margin-top:8px;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>河寬水深採樣計算</h1>
+
+    <section class="card">
+      <label for="width">河寬</label>
+      <input id="width" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例如 25.6">
+      <div class="unit">單位：公尺 m</div>
+    </section>
+
+    <section class="card">
+      <label for="depth">水深</label>
+      <input id="depth" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例如 160">
+      <div class="unit">單位：公分 cm</div>
+    </section>
+
+    <section class="card">
+      <div class="result small">
+        <div class="name">中央位置</div>
+        <div class="value" id="centerWidth">—</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="result">
+        <div class="name">左點 0.2D</div>
+        <div class="value" id="leftDepth">—</div>
+      </div>
+      <div class="result">
+        <div class="name">中央 0.5D</div>
+        <div class="value" id="midDepth">—</div>
+      </div>
+      <div class="result">
+        <div class="name">右點 0.8D</div>
+        <div class="value" id="rightDepth">—</div>
+      </div>
+      <div class="warn" id="warn"></div>
+    </section>
+
+    <div class="hint">
+      輸入後會自動計算，不用按按鈕。<br>
+      可用 Safari 加入主畫面，當成 App 使用。
+    </div>
+  </main>
+
+  <script>
+    const widthInput = document.getElementById("width");
+    const depthInput = document.getElementById("depth");
+
+    const centerWidth = document.getElementById("centerWidth");
+    const leftDepth = document.getElementById("leftDepth");
+    const midDepth = document.getElementById("midDepth");
+    const rightDepth = document.getElementById("rightDepth");
+    const warn = document.getElementById("warn");
+
+    function fmt(n){
+      if (!Number.isFinite(n)) return "—";
+      return (Math.round(n * 10) / 10).toFixed(1);
+    }
+
+    function calc(){
+      const w = parseFloat(widthInput.value);
+      const d = parseFloat(depthInput.value);
+
+      centerWidth.textContent = Number.isFinite(w) ? fmt(w / 2) + " m" : "—";
+      leftDepth.textContent = Number.isFinite(d) ? fmt(d * 0.2) + " cm" : "—";
+      midDepth.textContent = Number.isFinite(d) ? fmt(d * 0.5) + " cm" : "—";
+      rightDepth.textContent = Number.isFinite(d) ? fmt(d * 0.8) + " cm" : "—";
+
+      warn.textContent = "";
+      if (Number.isFinite(w) && w <= 0) warn.textContent = "河寬要大於 0";
+      if (Number.isFinite(d) && d <= 0) warn.textContent = "水深要大於 0";
+    }
+
+    widthInput.addEventListener("input", calc);
+    depthInput.addEventListener("input", calc);
+    calc();
+  </script>
+</body>
+</html>
